@@ -1,57 +1,57 @@
 # WS2812 LED Counter
 
-Un petit outil Arduino/FastLED pour **déterminer le nombre de LED d'un ruban WS2812/WS2812B**, sans les compter une par une.
+A simple Arduino/FastLED tool to **determine how many LEDs are on a WS2812/WS2812B strip** without counting them manually.
 
-## Principe
+## How it works
 
-Le programme allume les **N premières LED** du ruban. Depuis le moniteur série, on augmente ou diminue N jusqu'à ce que **la dernière LED soit allumée**. Le nombre affiché est alors le nombre de LED du ruban.
+The sketch lights up the **first N LEDs** on the strip. Using the Serial Monitor, increase or decrease N until **the last LED lights up**. The displayed value is then the number of LEDs on the strip.
 
-> Ce n'est pas une détection automatique : les WS2812 ne renvoient pas leur nombre au microcontrôleur. La dernière LED doit être visible et le ruban doit fonctionner correctement.
+> This is not automatic detection: WS2812 LEDs cannot report the total LED count to the microcontroller. The last LED must be visible, and the strip must be working correctly.
 
-## Matériel
+## Hardware
 
-- Une carte ESP32 (recommandée pour les longs rubans), ou une carte Arduino avec suffisamment de RAM
-- Un ruban WS2812/WS2812B
-- Une alimentation 5 V adaptée au ruban
-- La bibliothèque **FastLED** (à installer depuis le gestionnaire de bibliothèques de l'IDE Arduino)
+- An ESP32 board (recommended for long strips), or an Arduino board with enough RAM
+- A WS2812/WS2812B LED strip
+- A suitable 5 V power supply for the strip
+- The **FastLED** library (install it using the Arduino IDE Library Manager)
 
-## Branchement
+## Wiring
 
-| Ruban | Connexion |
+| LED strip | Connection |
 | --- | --- |
-| `DIN` | GPIO défini par `LED_PIN` (5 par défaut, à adapter à la carte) |
-| `GND` | GND de l'alimentation **et** GND de la carte |
-| `+5V` | +5 V de l'alimentation externe |
+| `DIN` | GPIO specified by `LED_PIN` (default: 5; adjust for your board) |
+| `GND` | Power supply GND **and** microcontroller GND |
+| `+5V` | External power supply +5 V |
 
-**Important :** ne pas alimenter un long ruban depuis la broche 5 V de la carte. Vérifier le sens du ruban (`DIN` / flèche). Pour un ESP32 (signal 3,3 V), un convertisseur de niveau logique 3,3 V → 5 V est recommandé pour une liaison fiable. Une résistance série d'environ 330 Ω sur les données est également recommandée.
+**Important:** Do not power a long LED strip from the board's 5 V pin. Check the strip's data direction (`DIN` / arrow). For an ESP32 (3.3 V data signal), a 3.3 V-to-5 V logic level shifter is recommended for reliable operation. A series resistor of approximately 330 Ω on the data line is also recommended.
 
 ## Installation
 
-1. Installer **FastLED** dans l'IDE Arduino.
-2. Ouvrir `ws2812-led-counter.ino`.
-3. Adapter `LED_PIN` à la broche réellement utilisée et `MAX_LEDS` au maximum estimé.
-4. Téléverser le programme.
-5. Ouvrir le **moniteur série à 115200 bauds**, avec fin de ligne **Nouvelle ligne**.
+1. Install **FastLED** in the Arduino IDE.
+2. Open `ws2812-led-counter.ino`.
+3. Set `LED_PIN` to the GPIO you are using and `MAX_LEDS` to a suitable estimated upper limit.
+4. Upload the sketch to your board.
+5. Open the **Serial Monitor at 115200 baud** and set the line ending to **Newline**.
 
-## Commandes
+## Commands
 
-| Commande | Action |
+| Command | Action |
 | --- | --- |
-| `100` | Allumer les 100 premières LED |
-| `+10` / `-10` | Ajouter / retirer 10 LED |
-| `+1` / `-1` | Ajouter / retirer 1 LED |
-| `0` | Tout éteindre |
+| `100` | Light up the first 100 LEDs |
+| `+10` / `-10` | Add / remove 10 lit LEDs |
+| `+1` / `-1` | Add / remove 1 lit LED |
+| `0` | Turn all LEDs off |
 
-**Exemple :** envoyer `200`, puis `+10` jusqu'à approcher de la fin, et enfin `+1` pour trouver le nombre exact.
+**Example:** Send `200`, then `+10` until you get close to the end of the strip, and finally `+1` to find the exact count.
 
-## Limites et précautions
+## Limitations and safety notes
 
-- Le programme réserve environ **3 octets de RAM par LED** (`MAX_LEDS = 1000` ≈ 3 Ko), hors autres besoins du programme : un Arduino Uno classique n'a pas assez de RAM pour cette configuration.
-- La luminosité est limitée (`BRIGHTNESS = 25`), mais une alimentation adaptée reste indispensable.
-- Si la fin du ruban est déjà atteinte, augmenter N ne change plus rien visuellement : repartir d'une valeur inférieure et avancer jusqu'à l'allumage de la dernière LED.
-- Si une LED ou une connexion de données est défectueuse, le résultat peut être incorrect.
-- Les références WS2812 et WS2812B sont prises en charge par la configuration par défaut. Pour d'autres modèles, adapter le type de LED et l'ordre des couleurs dans FastLED.
+- The sketch allocates approximately **3 bytes of RAM per LED** (`MAX_LEDS = 1000` uses about 3 KB), in addition to other memory requirements. A classic Arduino Uno does not have enough RAM for this configuration.
+- Brightness is limited (`BRIGHTNESS = 25`), but an appropriately sized power supply is still essential.
+- Once the end of the strip has been reached, increasing N will not produce any visible change. Start below the expected count and increase it until the last LED lights up.
+- A faulty LED or data connection may lead to an incorrect result.
+- WS2812 and WS2812B strips are supported by the default configuration. For other models, adjust the LED type and color order in FastLED.
 
-## Licence
+## License
 
-MIT — voir [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
